@@ -1,0 +1,20 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+double mobilePadding = 13.w;
+SizedBox kHeight = SizedBox(height: mobilePadding);
+SizedBox kWidth = SizedBox(width: mobilePadding);
+SizedBox kWidth10 = SizedBox(width: 10.w);
+SizedBox kWidth20 = SizedBox(width: 20.w);
+SizedBox kHeight10 = SizedBox(height: 10.w);
+SizedBox kHeight20 = SizedBox(height: 20.w);
+SizedBox kHeight30 = SizedBox(height: 30.w);
+SizedBox kHeight9 = SizedBox(height: 9.w);
+SizedBox kWidth5 = SizedBox(width: 5.w);
+SizedBox kHeight5 = SizedBox(height: 5.w);
+SizedBox kHeight8 = SizedBox(height: 8.w);
+SizedBox kWidth8 = SizedBox(width: 8.w);
+SizedBox kHeight3 = SizedBox(height: 3.w);
+SizedBox kWidth3 = SizedBox(width: 3.w);
+SizedBox kWidth2 = SizedBox(width: 2.w);
+SizedBox kHeight2 = SizedBox(width: 2.w);
