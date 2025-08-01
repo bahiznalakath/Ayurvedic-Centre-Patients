@@ -24,11 +24,18 @@ class AuthController extends GetxController {
       try {
         showLoaderDialog();
         isLoading(true);
-        LoginServices.checkLogin(emailController.text, passwordController.text)
+        LoginServices.checkLoginMultipart(
+                emailController.text, passwordController.text)
             .then((response) async {
           isLoading(false);
           if (response.isSuccess) {
             loginResponse = LoginResponse.fromJson(response.response.body);
+            SharedStorage().setSharedString(
+              AppConstants.userToken,
+              loginResponse.token ?? "",
+            );
+
+            debugPrint("hehhehheh${loginResponse.token}");
             saveResponse(loginResponse);
             Get.back();
             Get.offAll(PatientListScreen());

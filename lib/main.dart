@@ -1,4 +1,4 @@
-import 'package:ayurvedic_centre_patients/view/patient_list_screen.dart';
+import 'package:ayurvedic_centre_patients/view/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
               useMaterial3: true,
             ),
-            home: PatientListScreen(),
+            home: SplashScreen(),
           );
         });
   }

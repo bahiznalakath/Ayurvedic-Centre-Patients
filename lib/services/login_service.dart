@@ -6,19 +6,23 @@ import 'package:get/get_connect/http/src/response/response.dart';
 import 'api_client/api_client.dart';
 
 class LoginServices {
-  static Future<ResponseModel> checkLogin(String email, String password) async {
-    var body = {
+  /// Multipart-based login API example
+  static Future<ResponseModel> checkLoginMultipart(
+      String email, String password) async {
+    var fields = {
       'username': email,
       'password': password,
     };
-    print(body);
-    Response response = await ApiClient().postData(AppConstants.loginUrl, body);
-    ResponseModel responseModel;
-    if (response.statusCode == 200) {
-      responseModel = ResponseModel(true, response.statusText ?? '', response);
-    } else {
-      responseModel = ResponseModel(false, response.statusText ?? '', response);
-    }
-    return responseModel;
+
+    Response response = await ApiClient().comment(
+      uri: AppConstants.loginUrl,
+      fields: fields,
+    );
+
+    return ResponseModel(
+      response.statusCode == 200,
+      response.statusText ?? '',
+      response,
+    );
   }
 }
