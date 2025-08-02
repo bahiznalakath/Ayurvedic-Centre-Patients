@@ -1,5 +1,7 @@
+import 'package:ayurvedic_centre_patients/controllers/patient_controller.dart';
 import 'package:ayurvedic_centre_patients/utils/color.dart';
 import 'package:ayurvedic_centre_patients/utils/dimensions.dart';
+import 'package:ayurvedic_centre_patients/view/patient_details_screen.dart';
 import 'package:ayurvedic_centre_patients/view/register_patient_screen.dart';
 import 'package:ayurvedic_centre_patients/widgets/button_widget.dart';
 import 'package:ayurvedic_centre_patients/widgets/patient_list_tile.dart';
@@ -8,7 +10,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class PatientListScreen extends StatelessWidget {
-  const PatientListScreen({super.key});
+  PatientListScreen({super.key});
+
+  final PatientController controller = Get.put(PatientController());
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -30,74 +35,128 @@ class PatientListScreen extends StatelessWidget {
         ],
       ),
       backgroundColor: Colors.white,
-      body: ListView(
-        padding: EdgeInsets.all(mobilePadding),
-        children: [
-          kHeight20,
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: mobilePadding),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 249.w,
-                  height: 40.h,
-                  child: SearchBar(),
+      body: Obx(() {
+        return RefreshIndicator(
+          onRefresh: () => controller.getPatientData(),
+          child: ListView(
+            controller: _scrollController,
+            padding: EdgeInsets.all(mobilePadding),
+            children: [
+              kHeight20,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: mobilePadding),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 249.w,
+                      height: 40.h,
+                      child: SearchBar(
+                        onChanged: (value) => controller.setSearchQuery(value),
+                      ),
+                    ),
+                    Spacer(),
+                    SizedBox(
+                      width: 85.w,
+                      height: 40.h,
+                      child: InkWell(
+                        onTap: () => controller.filterPatients(),
+                        child: ButtonWidget(
+                          title: "Search",
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                Spacer(),
-                SizedBox(
-                  width: 85.w,
-                  height: 40.h,
-                  child: ButtonWidget(
-                    title: "Search",
-                    fontSize: 14,
+              ),
+              kHeight20,
+              const Divider(),
+              kHeight10,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: mobilePadding),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Sort by :',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 17.sp,
+                        height: 1.0,
+                        letterSpacing: 0.0,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Obx(() => DateDropdown(
+                          dates: controller.datesList,
+                          selectedDate: controller.selectedDate.value,
+                          onDateSelected: controller.setSelectedDate,
+                        )),
+                  ],
+                ),
+              ),
+              kHeight20,
+              if (controller.isLoading.value)
+                Center(child: CircularProgressIndicator()),
+              if (!controller.isLoading.value &&
+                  controller.filteredPatientList.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 100.h),
+                    child: Text(
+                      'No patients found',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 18.sp,
+                        color: Colors.grey,
+                      ),
+                    ),
                   ),
                 ),
-              ],
-            ),
-          ),
-          kHeight20,
-          const Divider(),
-          kHeight10,
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: mobilePadding),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Sort by :',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500, // Medium
-                    fontSize: 17.sp, // or 16.0 if not using screenutil
-                    height: 1.0, // 100% line height
-                    letterSpacing: 0.0,
-                    color: Colors.black, // or your theme color
-                  ),
+              if (!controller.isLoading.value &&
+                  controller.filteredPatientList.isNotEmpty)
+                ListView.separated(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: controller.filteredPatientList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final item = controller.filteredPatientList[index];
+                    return InkWell(
+                      onTap: () =>
+                          Get.to(() => PatientDetailsScreen(patient: item)),
+                      child: PatientCard(
+                        patientNo: (index + 1).toString().padLeft(2, '0'),
+                        name: item.name ?? "",
+                        package: PatientController.getTreatmentNames(item),
+                        date: item.dateNdTime != null
+                            ? PatientController.formatDate(item.dateNdTime!)
+                            : "N/A",
+                        patientType: PatientController.getPatientType(item),
+                      ),
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return kHeight10;
+                  },
                 ),
-                DateDropdown()
-              ],
-            ),
+            ],
           ),
-          kHeight20,
-          PatientCard(
-            patientNo: "01",
-            name: "Vikram Singh",
-            package: "Couple Combo Package (Rejuven...",
-            date: "31/01/2024",
-            patientType: "2 persons",
-          ),
-        ],
-      ),
+        );
+      }),
     );
   }
 }
 
 class SearchBar extends StatelessWidget {
-  const SearchBar({super.key});
+  final ValueChanged<String> onChanged;
+
+  const SearchBar({super.key, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      onChanged: onChanged,
       style: TextStyle(
         fontFamily: 'Poppins',
         fontWeight: FontWeight.w400,
@@ -106,7 +165,7 @@ class SearchBar extends StatelessWidget {
       ),
       decoration: InputDecoration(
         contentPadding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
-        hintText: 'Search for treatments',
+        hintText: 'Search by name or phone',
         hintStyle: TextStyle(
           fontFamily: 'Poppins',
           fontWeight: FontWeight.w400,
@@ -114,7 +173,7 @@ class SearchBar extends StatelessWidget {
           color: Colors.black.withOpacity(0.6),
         ),
         filled: true,
-        fillColor: Colors.white, // #00000033
+        fillColor: Colors.white,
         prefixIcon: Padding(
           padding: EdgeInsets.all(10.w),
           child: Icon(
@@ -142,18 +201,17 @@ class SearchBar extends StatelessWidget {
   }
 }
 
-class DateDropdown extends StatefulWidget {
-  const DateDropdown({super.key});
+class DateDropdown extends StatelessWidget {
+  final List<String> dates;
+  final String? selectedDate;
+  final Function(String?) onDateSelected;
 
-  @override
-  State<DateDropdown> createState() => _DateDropdownState();
-}
-
-class _DateDropdownState extends State<DateDropdown> {
-  String? selectedDate;
-
-  // Replace this with your real date list later
-  final List<String> dates = ['2025-07-31', '2025-08-01', '2025-08-02'];
+  const DateDropdown({
+    super.key,
+    required this.dates,
+    required this.selectedDate,
+    required this.onDateSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +222,7 @@ class _DateDropdownState extends State<DateDropdown> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(33.r),
         border: Border.all(
-          color: const Color(0x4D000000), // #0000004D
+          color: const Color(0x4D000000),
           width: 1,
         ),
       ),
@@ -183,7 +241,7 @@ class _DateDropdownState extends State<DateDropdown> {
             ),
           ),
           icon: Transform.rotate(
-            angle: -90 * 3.1416 / 180, // -90 degrees
+            angle: -90 * 3.1416 / 180,
             child: Icon(
               Icons.arrow_back_ios_new,
               size: 20.w,
@@ -191,11 +249,7 @@ class _DateDropdownState extends State<DateDropdown> {
             ),
           ),
           isExpanded: true,
-          onChanged: (value) {
-            setState(() {
-              selectedDate = value;
-            });
-          },
+          onChanged: onDateSelected,
           items: dates.map((date) {
             return DropdownMenuItem<String>(
               value: date,

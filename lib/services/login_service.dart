@@ -6,7 +6,6 @@ import 'package:get/get_connect/http/src/response/response.dart';
 import 'api_client/api_client.dart';
 
 class LoginServices {
-  /// Multipart-based login API example
   static Future<ResponseModel> checkLoginMultipart(
       String email, String password) async {
     var fields = {
@@ -24,5 +23,16 @@ class LoginServices {
       response.statusText ?? '',
       response,
     );
+  }
+
+  static Future<ResponseModel> getPatientListUrl() async {
+    Response response = await ApiClient().getData(AppConstants.patientListUrl);
+    ResponseModel responseModel;
+    if (response.statusCode == 200) {
+      responseModel = ResponseModel(true, response.statusText ?? '', response);
+    } else {
+      responseModel = ResponseModel(false, response.statusText ?? '', response);
+    }
+    return responseModel;
   }
 }
