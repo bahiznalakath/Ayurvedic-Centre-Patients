@@ -28,13 +28,15 @@ class ApiClient extends GetConnect {
       return const Response(statusCode: 0, statusText: noNetwork);
     }
 
-    final headers = {
-      if (token != null) 'Authorization': 'Bearer $token',
-    };
-
     try {
+      final headers = <String, String>{};
+      if (token != null) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+
       final response =
-          await get('${AppConstants.baseUrl}$uri', headers: headers);
+          await get("${AppConstants.baseUrl}$uri", headers: headers);
+      print(response.body);
       return handleResponse(response);
     } catch (e) {
       return Response(statusCode: 1, statusText: e.toString());
