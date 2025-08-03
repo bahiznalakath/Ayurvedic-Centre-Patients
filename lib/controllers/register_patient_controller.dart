@@ -118,10 +118,15 @@ class RegisterPatientController extends GetxController {
   var balanceAmountController = TextEditingController();
 
   void submit() async {
+    debugPrint("branchId ${selectedBranchId.value}");
     double? totalAmount = double.tryParse(totalAmountController.text);
     double? advanceAmount = double.tryParse(advanceAmountController.text);
     double? balanceAmount = double.tryParse(balanceAmountController.text);
     double? discountAmount = double.tryParse(discountAmountController.text);
+    // int? branchId = int.tryParse(selectedBranch.value);
+    List<int> selectedTreatmentIds =
+        selectedTreatmentsList.map((t) => int.parse(t.treatmentId)).toList();
+
     String convertedDate = selectedDate.value != null
         ? DateFormat('dd/MM/yyyy - hh:mm a').format(selectedDate.value!)
         : '';
@@ -143,19 +148,21 @@ class RegisterPatientController extends GetxController {
       try {
         showLoaderDialog();
         Services.registerationSubmit(
-            nameController.text,
-            whatsappController.text,
-            addressController.text,
-            selectedLocation.value,
-            selectedBranch.value,
-            totalAmount!,
-            discountAmount!,
-            advanceAmount!,
-            balanceAmount!,
-            convertedDate,
-            '',
-            '',
-            int.parse(selectedBranch.value), []).then((response) async {
+                nameController.text,
+                whatsappController.text,
+                addressController.text,
+                selectedLocation.value,
+                selectedBranch.value,
+                totalAmount!,
+                discountAmount!,
+                advanceAmount!,
+                balanceAmount!,
+                convertedDate,
+                '',
+                '',
+                selectedBranchId.value,
+                selectedTreatmentIds)
+            .then((response) async {
           Get.back();
           if (response.isSuccess) {
             // loginResponse = LoginResponse.fromJson(response.response.body);

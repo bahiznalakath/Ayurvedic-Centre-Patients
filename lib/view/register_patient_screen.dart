@@ -94,7 +94,7 @@ class RegisterPatientScreen extends StatelessWidget {
                 ),
                 kHeight9,
                 LoginTextField(
-                  keyBoardType: TextInputType.name,
+                  keyBoardType: TextInputType.phone,
                   icon: 'icon',
                   hintText: "Enter your Whatsapp number",
                   controller: controller.whatsappController,

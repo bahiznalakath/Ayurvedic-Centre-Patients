@@ -1,5 +1,6 @@
 import 'package:ayurvedic_centre_patients/models/models/response_model.dart';
 import 'package:ayurvedic_centre_patients/utils/constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/response/response.dart';
 
@@ -38,7 +39,7 @@ class Services {
     String date_nd_time,
     String male,
     String female,
-    int branch,
+    String branch,
     List<int> treatments,
   ) async {
     var fields = {
@@ -58,7 +59,7 @@ class Services {
       'branch': branch,
       'treatments': treatments,
     };
-
+    debugPrint("===>$fields");
     Response response = await ApiClient().postData(
       AppConstants.patientUpdateUrl,
       fields,
