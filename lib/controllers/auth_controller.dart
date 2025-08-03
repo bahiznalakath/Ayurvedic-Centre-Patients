@@ -24,7 +24,7 @@ class AuthController extends GetxController {
       try {
         showLoaderDialog();
         isLoading(true);
-        LoginServices.checkLoginMultipart(
+        Services.checkLoginMultipart(
                 emailController.text, passwordController.text)
             .then((response) async {
           isLoading(false);

@@ -7,6 +7,7 @@ SizedBox kWidth = SizedBox(width: mobilePadding);
 SizedBox kWidth10 = SizedBox(width: 10.w);
 SizedBox kWidth20 = SizedBox(width: 20.w);
 SizedBox kHeight10 = SizedBox(height: 10.w);
+SizedBox kHeight15 = SizedBox(height: 15.w);
 SizedBox kHeight20 = SizedBox(height: 20.w);
 SizedBox kHeight30 = SizedBox(height: 30.w);
 SizedBox kHeight9 = SizedBox(height: 9.w);

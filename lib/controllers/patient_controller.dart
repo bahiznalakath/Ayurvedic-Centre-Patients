@@ -22,7 +22,7 @@ class PatientController extends GetxController {
   Future<void> getPatientData() async {
     isLoading.value = true;
     try {
-      final response = await LoginServices.getPatientListUrl();
+      final response = await Services.getPatientListUrl();
       if (response.isSuccess) {
         patientResponse = PatientListResponse.fromJson(response.response.body);
         patientList.value = patientResponse.patient ?? [];
