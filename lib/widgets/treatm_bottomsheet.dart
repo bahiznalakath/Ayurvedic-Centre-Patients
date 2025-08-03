@@ -6,14 +6,27 @@ import 'package:get/get.dart';
 
 // Treatment Form Screen
 class TreatmentFormScreen extends StatelessWidget {
-  @override
+  final String? treatmentId;
+  final int? male;
+  final int? female;
+
+  TreatmentFormScreen({
+    Key? key,
+    this.treatmentId,
+    this.male,
+    this.female,
+  }) : super(key: key);
+
   final RegisterPatientController controller =
       Get.find<RegisterPatientController>();
 
-  TreatmentFormScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
+    if (treatmentId != null) {
+      controller.selectedTreatment.value = treatmentId!;
+      controller.maleCount.value = male ?? 0;
+      controller.femaleCount.value = female ?? 0;
+    }
     return Padding(
       padding: EdgeInsets.all(20.w),
       child: Container(
@@ -143,7 +156,7 @@ class TreatmentFormScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 50.h,
                 child: ElevatedButton(
-                  onPressed: controller.submit,
+                  onPressed: () => controller.saveTreatmentsList(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[700],
                     foregroundColor: Colors.white,

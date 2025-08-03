@@ -42,32 +42,19 @@ class RegisterPatientController extends GetxController {
   // Use reactive nullable types
   var selectedLocation = "".obs;
   var selectedBranch = "".obs;
+  var selectedBranchId = ''.obs;
 
   List<String> locationOptions = ['Location A', 'Location B', 'Location C'];
   var branchOptions = <String>[].obs;
 
   @override
-  void onInit() {
-    loadInitialData();
-    super.onInit();
-  }
-
-  Future<void> loadInitialData() async {
-    showLoaderDialog();
-    try {
-      await Future.wait([
-        getBranchListData(),
-        getTreatmentData(), // Renamed from getPatientData
-      ]);
-    } catch (e) {
-      showCustomSnackBar("Initialization failed: $e");
-    } finally {
-      Get.back(); // Close loader
-    }
+  void onReady() {
+    getBranchListData();
+    // TODO: implement onReady
+    super.onReady();
   }
 
   Future<void> getTreatmentData() async {
-    // Renamed for clarity
     try {
       final response = await Services.getTreatmentUrl();
       if (response.isSuccess) {
@@ -83,12 +70,16 @@ class RegisterPatientController extends GetxController {
   }
 
   Future<void> getBranchListData() async {
+    showLoaderDialog();
     try {
       final response = await Services.getBranchList();
+      getTreatmentData();
+      Get.back();
       if (response.isSuccess) {
         branchListResponse =
             BranchListResponse.fromJson(response.response.body);
         branches.value = branchListResponse.branches ?? [];
+        print("::${branches.value}::");
         branchOptions.value =
             branches.map((branch) => branch.name ?? 'Unnamed Branch').toList();
       } else {
@@ -185,4 +176,55 @@ class RegisterPatientController extends GetxController {
       } finally {}
     }
   }
+
+  RxList<SelectedTreatment> selectedTreatmentsList = <SelectedTreatment>[].obs;
+
+  void saveTreatmentsList() {
+    if (selectedTreatment.isEmpty) {
+      showCustomSnackBar("Please select a treatment", isError: true);
+
+      return;
+    }
+
+    if (maleCount.value == 0 && femaleCount.value == 0) {
+      showCustomSnackBar("Please add at least one patient");
+      return;
+    }
+
+    // Save to list
+    final treatmentData = SelectedTreatment(
+      treatmentId: selectedTreatment.value,
+      maleCount: maleCount.value,
+      femaleCount: femaleCount.value,
+    );
+
+    selectedTreatmentsList.add(treatmentData);
+    printSelectedTreatments();
+    // Reset fields
+    Get.back();
+    selectedTreatment.value = '';
+    maleCount.value = 0;
+    femaleCount.value = 0;
+
+    showCustomSnackBar("Treatment added successfully", isError: false);
+  }
+
+  void printSelectedTreatments() {
+    for (var item in selectedTreatmentsList) {
+      print(
+          "Treatment ID: ${item.treatmentId}, Male: ${item.maleCount}, Female: ${item.femaleCount}");
+    }
+  }
+}
+
+class SelectedTreatment {
+  final String treatmentId;
+  final int maleCount;
+  final int femaleCount;
+
+  SelectedTreatment({
+    required this.treatmentId,
+    required this.maleCount,
+    required this.femaleCount,
+  });
 }

@@ -1,5 +1,6 @@
 import 'package:ayurvedic_centre_patients/controllers/register_patient_controller.dart';
 import 'package:ayurvedic_centre_patients/utils/dimensions.dart';
+import 'package:ayurvedic_centre_patients/widgets/button_widget.dart';
 import 'package:ayurvedic_centre_patients/widgets/custom_dropdown.dart';
 import 'package:ayurvedic_centre_patients/widgets/custom_hour_minute__picker.dart';
 import 'package:ayurvedic_centre_patients/widgets/login_input_widget.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../models/response_models/treatment_list_response.dart';
 import '../widgets/custom_date_picker.dart';
 import '../widgets/treatm_bottomsheet.dart';
 
@@ -20,6 +22,13 @@ class RegisterPatientScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: EdgeInsets.all(mobilePadding),
+        child: InkWell(
+            onTap: () => controller.submit(),
+            child: ButtonWidget(title: "Register Now")),
+      ),
       appBar: AppBar(
         backgroundColor: Colors.white,
         actions: [
@@ -110,42 +119,84 @@ class RegisterPatientScreen extends StatelessWidget {
                   controller: controller.addressController,
                 ),
                 kHeight10,
-                // CustomDropdown<String>(
-                //   hintText: 'Select Your Location',
-                //   label: 'Location',
-                //   value: controller.selectedLocation.value,
-                //   items: controller.locationOptions
-                //       .map(
-                //         (loc) => DropdownMenuItem(value: loc, child: Text(loc)),
-                //       )
-                //       .toList(),
-                //   onChanged: (value) {
-                //     controller.selectedLocation.value =
-                //         value!; // Fix: assign value TO selectedLocation
-                //     // Update your state if using setState() or your state management solution
-                //   },
-                // ),
-                kHeight10,
+                Text(
+                  'Location',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16.sp,
+                    height: 1.0,
+                    letterSpacing: 0.0,
+                    color: Colors.black, // Or your preferred color
+                  ),
+                ),
+                kHeight9,
                 Obx(() {
-                  return CustomDropdown<String>(
-                    hintText: 'Select the branch',
-                    label: 'Branch',
-                    value: controller.selectedBranch.value,
-                    items: controller.branchOptions.value
-                        .map(
-                          (loc) =>
-                              DropdownMenuItem(value: loc, child: Text(loc)),
-                        )
-                        .toList(),
-                    onChanged: (value) {
-                      controller.selectedBranch.value =
-                          value!; // Fix: assign value TO selectedLocation
-                      // Update your state if using setState() or your state management solution
+                  return CustomSelectionDropdown(
+                    label: 'Select Your Location',
+                    onChanged: (item) {
+                      controller.selectedLocation.value = item!;
                     },
+                    itemValue: controller.selectedLocation.value,
+                    items: controller.locationOptions
+                        .map<DropdownMenuItem<String>>((value) {
+                      return DropdownMenuItem<String>(
+                        value: value.toString(),
+                        child: Text(
+                          value ?? "",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16.sp,
+                            height: 1.4,
+                            letterSpacing: 0.0,
+                            color: Colors.black, // change if needed
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  );
+                }),
+                Text(
+                  'Branch',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16.sp,
+                    height: 1.0,
+                    letterSpacing: 0.0,
+                    color: Colors.black, // Or your preferred color
+                  ),
+                ),
+                kHeight9,
+                Obx(() {
+                  return CustomSelectionDropdown(
+                    label: 'Select Your branch',
+                    onChanged: (item) {
+                      controller.selectedBranchId.value = item!;
+                    },
+                    itemValue: controller.selectedBranchId.value,
+                    items: controller.branches
+                        .map<DropdownMenuItem<String>>((value) {
+                      // debugPrint()
+                      return DropdownMenuItem<String>(
+                        value: value.name.toString(),
+                        child: Text(
+                          value.name ?? "",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16.sp,
+                            height: 1.4,
+                            letterSpacing: 0.0,
+                            color: Colors.black, // change if needed
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   );
                 }),
                 kHeight10,
-
                 Text(
                   'Treatments',
                   style: TextStyle(
@@ -158,7 +209,34 @@ class RegisterPatientScreen extends StatelessWidget {
                   ),
                 ),
                 kHeight9,
-                TreatmentsWidget(),
+                Obx(() => Column(
+                      children: controller.selectedTreatmentsList.map((item) {
+                        final treatment = controller.treatments.firstWhere(
+                          (t) => t.id.toString() == item.treatmentId,
+                          orElse: () => Treatment(
+                              id: int.parse(item.treatmentId), name: 'Unknown'),
+                        );
+
+                        return TreatmentsWidget(
+                          treatmentName: treatment.name ?? "Unknown",
+                          maleCount: item.maleCount,
+                          femaleCount: item.femaleCount,
+                          onDelete: () {
+                            controller.selectedTreatmentsList.remove(item);
+                          },
+                          onEdit: () {
+                            Get.bottomSheet(
+                              TreatmentFormScreen(
+                                treatmentId: item.treatmentId,
+                                male: item.maleCount,
+                                female: item.femaleCount,
+                              ),
+                            );
+                            controller.selectedTreatmentsList.remove(item);
+                          },
+                        );
+                      }).toList(),
+                    )),
                 kHeight9,
                 InkWell(
                   onTap: () => Get.bottomSheet(TreatmentFormScreen()),
@@ -187,12 +265,6 @@ class RegisterPatientScreen extends StatelessWidget {
                               color: Colors.black, // Or your preferred color
                             ),
                           ),
-                          // CustomText(
-                          //   text: 'Add Treatments',
-                          //   fontSize: 16,
-                          //   fontWeight: FontWeight.w600,
-                          //   color: Colors.white,
-                          // ),
                         ],
                       ),
                     ),
@@ -212,7 +284,7 @@ class RegisterPatientScreen extends StatelessWidget {
                 ),
                 kHeight9,
                 LoginTextField(
-                  keyBoardType: TextInputType.name,
+                  keyBoardType: TextInputType.number,
                   icon: 'icon',
                   hintText: "00",
                   controller: controller.totalAmountController,
@@ -231,7 +303,7 @@ class RegisterPatientScreen extends StatelessWidget {
                 ),
                 kHeight9,
                 LoginTextField(
-                  keyBoardType: TextInputType.name,
+                  keyBoardType: TextInputType.number,
                   icon: 'icon',
                   hintText: "00",
                   controller: controller.discountAmountController,
@@ -274,7 +346,7 @@ class RegisterPatientScreen extends StatelessWidget {
                 ),
                 kHeight9,
                 LoginTextField(
-                  keyBoardType: TextInputType.name,
+                  keyBoardType: TextInputType.number,
                   icon: 'icon',
                   hintText: "00",
                   controller: controller.advanceAmountController,
@@ -294,7 +366,7 @@ class RegisterPatientScreen extends StatelessWidget {
                 ),
                 kHeight9,
                 LoginTextField(
-                  keyBoardType: TextInputType.name,
+                  keyBoardType: TextInputType.number,
                   icon: 'icon',
                   hintText: "00",
                   controller: controller.balanceAmountController,
@@ -317,7 +389,10 @@ class RegisterPatientScreen extends StatelessWidget {
                 kHeight15
               ],
             ),
-          )
+          ),
+          kHeight30,
+          kHeight30,
+          kHeight30,
         ],
       ),
     );

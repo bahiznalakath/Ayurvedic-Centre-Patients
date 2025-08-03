@@ -3,57 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class TreatmentsWidget extends StatelessWidget {
-  const TreatmentsWidget({super.key});
+  final String treatmentName;
+  final int maleCount;
+  final int femaleCount;
+  final VoidCallback onDelete;
+  final VoidCallback onEdit;
 
-  Widget buildCounter(
-    int count, {
-    required VoidCallback onIncrement,
-    required VoidCallback onDecrement,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-      constraints: BoxConstraints(minWidth: 60, maxWidth: 90),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          GestureDetector(
-            onTap: onDecrement,
-            child: Padding(
-              padding: EdgeInsets.all(4),
-              child: Icon(Icons.remove, size: 16, color: Colors.grey[600]),
-            ),
-          ),
-          Container(
-            width: 24,
-            alignment: Alignment.center,
-            child: Text(
-              count.toString(),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 16.sp,
-                height: 1.0,
-                letterSpacing: 0.0,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: onIncrement,
-            child: Padding(
-              padding: EdgeInsets.all(4),
-              child: Icon(Icons.add, size: 16, color: Colors.grey[600]),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  const TreatmentsWidget({
+    Key? key,
+    required this.treatmentName,
+    required this.maleCount,
+    required this.femaleCount,
+    required this.onDelete,
+    required this.onEdit,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +45,7 @@ class TreatmentsWidget extends StatelessWidget {
                     SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Couple Combo package i..',
+                        treatmentName,
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w400,
@@ -91,24 +54,21 @@ class TreatmentsWidget extends StatelessWidget {
                           letterSpacing: 0.0,
                           color: Colors.black,
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
-                      // CustomText(
-                      //   text: 'Couple Combo package i..',
-                      //   fontSize: 16,
-                      //   fontWeight: FontWeight.w600,
-                      //   color: Colors.grey[800],
-                      //   overflow: TextOverflow.ellipsis,
-                      //   maxLines: 1,
-                      // ),
                     ),
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: Color(0xFFFF6B6B),
-                        shape: BoxShape.circle,
+                    GestureDetector(
+                      onTap: onDelete,
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFFF6B6B),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.close, color: Colors.white, size: 20),
                       ),
-                      child: Icon(Icons.close, color: Colors.white, size: 20),
                     ),
                   ],
                 ),
@@ -116,77 +76,20 @@ class TreatmentsWidget extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Flexible(
-                      flex: 1,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              'Male',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 16.sp,
-                                height: 1.0,
-                                letterSpacing: 0.0,
-                                color: Colors.black,
-                              ),
-                            ),
-                            // CustomText(
-                            //   text: 'Male',
-                            //   fontSize: 16,
-                            //   fontWeight: FontWeight.w500,
-                            //   color: Color(0xFF4CAF50),
-                            //   overflow: TextOverflow.ellipsis,
-                            // ),
-                          ),
-                          SizedBox(width: 6),
-                          // buildCounter(
-                          //   provider.maleCount,
-                          //   onDecrement: provider.decrementMale,
-                          //   onIncrement: provider.incrementMale,
-                          // ),
-                        ],
-                      ),
-                    ),
-                    Flexible(
-                      flex: 1,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              'Female',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 16.sp,
-                                height: 1.0,
-                                letterSpacing: 0.0,
-                                color: Colors.black,
-                              ),
-                            ),
-
-                            // CustomText(
-                            //   text: 'Female',
-                            //   fontSize: 16,
-                            //   fontWeight: FontWeight.w500,
-                            //   color: Color(0xFF4CAF50),
-                            //   overflow: TextOverflow.ellipsis,
-                            // ),
-                          ),
-                          SizedBox(width: 6),
-                          // buildCounter(
-                          //   provider.femaleCount,
-                          //   onDecrement: provider.decrementFemale,
-                          //   onIncrement: provider.incrementFemale,
-                          // ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Icon(Icons.edit, color: primaryColor, size: 24),
+                    Row(children: [
+                      Text("Male", style: _textStyle()),
+                      SizedBox(width: 6),
+                      Text("$maleCount", style: _textStyle()),
+                    ]),
+                    Row(children: [
+                      Text("Female", style: _textStyle()),
+                      SizedBox(width: 6),
+                      Text("$femaleCount", style: _textStyle()),
+                    ]),
+                    GestureDetector(
+                      onTap: onEdit,
+                      child: Icon(Icons.edit, color: primaryColor, size: 24),
+                    )
                   ],
                 ),
               ],
@@ -197,4 +100,11 @@ class TreatmentsWidget extends StatelessWidget {
       ],
     );
   }
+
+  TextStyle _textStyle() => TextStyle(
+        fontFamily: 'Poppins',
+        fontWeight: FontWeight.w400,
+        fontSize: 16.sp,
+        color: Colors.black,
+      );
 }
