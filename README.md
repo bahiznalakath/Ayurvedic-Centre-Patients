@@ -1,6 +1,6 @@
 # ayurvedic_centre_patients
 
-Ayurvedic Centre Patients is a Flutter-based mobile app developed as a machine task for Noviindus Technologies. It helps manage patient records for an Ayurvedic center with features to add, view, and edit details. The app showcases clean UI, smooth navigation, and efficient state handling. Built to demonstrate my Flutter development skills and understanding of real-world app structure.
+Ayurvedic Centre Patients is a Flutter-based mobile app developed. It helps manage patient records for an Ayurvedic center with features to add, view, and edit details. The app showcases clean UI, smooth navigation, and efficient state handling. Built to demonstrate my Flutter development skills and understanding of real-world app structure.
 
 ## Getting Started
 
